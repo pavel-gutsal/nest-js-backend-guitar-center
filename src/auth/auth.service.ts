@@ -69,7 +69,19 @@ export class AuthService {
     if (user && (await bcrypt.compare(password, user.password))) {
       return this.generateToken(user);
     } else {
-      throw new UnauthorizedException('Please check your login credentials');
+      throw new UnauthorizedException('wrong email or password');
+    }
+  }
+
+  async validate(userEmail: string) {
+    const user: UserDocument = await this.userModel.findOne({
+      email: userEmail,
+    });
+
+    if (user) {
+      return this.generateToken(user);
+    } else {
+      throw new UnauthorizedException('json web token invalid');
     }
   }
 }
