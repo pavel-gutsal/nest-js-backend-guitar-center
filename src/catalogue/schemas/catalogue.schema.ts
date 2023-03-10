@@ -3,18 +3,21 @@ import { Document } from 'mongoose';
 import { Category } from '../types';
 
 @Schema({ timestamps: true })
-export class Catalogue extends Document {
+export class Item extends Document {
   @Prop({ required: true })
   category: Category;
 
-  @Prop({ required: true, type: String })
+  @Prop({ required: true, type: String, unique: true })
   model: string;
+
+  @Prop({ required: true, type: String })
+  name: string;
 
   @Prop({ required: true, type: String })
   mainPhoto: string;
 
-  @Prop({ required: true, type: String })
-  rating: string;
+  @Prop({ required: true, type: Number })
+  rating: number;
 
   @Prop({ required: true, type: Number })
   totalPrice: number;
@@ -29,4 +32,4 @@ export class Catalogue extends Document {
   shortSpecs: string[][];
 }
 
-export const CatalogueSchema = SchemaFactory.createForClass(Catalogue);
+export const CatalogueSchema = SchemaFactory.createForClass(Item);

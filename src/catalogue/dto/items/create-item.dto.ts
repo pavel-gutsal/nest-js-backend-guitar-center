@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsArray,
   IsBoolean,
@@ -6,37 +7,53 @@ import {
   IsNumber,
   IsString,
 } from 'class-validator';
-import { Category } from '../types';
+import { ObjectId } from 'mongoose';
+import { Category } from '../../types';
 
-export class CreateCatalogueItemDto {
+export class CreateItemDto {
+  @ApiProperty()
   @IsNotEmpty()
-  @IsString()
   @IsEnum(Category)
   category: string;
 
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  model: string;
+  name: string;
 
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   mainPhoto: string;
 
+  @ApiProperty()
   @IsNotEmpty()
   @IsNumber()
   rating: number;
 
+  @ApiProperty()
   @IsNotEmpty()
   @IsNumber()
   totalPrice: number;
 
+  @ApiProperty()
   @IsNumber()
   discountedPrice: number;
 
+  @ApiProperty()
   @IsNotEmpty()
   @IsBoolean()
   bestSeller: boolean;
 
+  @ApiProperty()
   @IsArray()
   shortSpecs: string[][];
+}
+
+export class CatalogItem extends CreateItemDto {
+  @ApiProperty()
+  _id: ObjectId;
+
+  @ApiProperty()
+  model: string;
 }
