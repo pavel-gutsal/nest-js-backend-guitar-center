@@ -1,7 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { CatalogItem } from '../dto/items/create-item.dto';
-import { SpecsFromServer } from '../dto/specifications/create-specification.dto';
 
 export enum Category {
   PHONES = 'phones',

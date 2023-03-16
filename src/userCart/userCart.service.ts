@@ -18,7 +18,6 @@ export class UserCartService {
     if (!response) {
       throw new NotFoundException('Item does not exist in database');
     }
-
     return { liked: response.liked, cart: response.cart } as CartResponse;
   }
 
@@ -41,11 +40,11 @@ export class UserCartService {
       liked = isLiked ? liked.filter((el) => el !== model) : [...liked, model];
       return { liked };
     } else {
-      const inCart = cart.some((el) => el.name === model);
+      const inCart = cart.some((el) => el.model === model);
 
       cart = inCart
-        ? cart.filter((el) => el.name !== model)
-        : [...cart, { name: model, number: 1 }];
+        ? cart.filter((el) => el.model !== model)
+        : [...cart, { model, number: 1 }];
 
       return { cart };
     }
@@ -67,10 +66,8 @@ export class UserCartService {
   async updateSpecificCart(email: string, cartDto: Cart) {
     const userCart = await this.getUserCart(email);
 
-    const { cart } = userCart;
-
     const updaredCartArray = userCart.cart.map((cart) =>
-      cart.name === cartDto.name ? cartDto : cart,
+      cart.model === cartDto.model ? cartDto : cart,
     );
 
     const updatedCart = await this.userCartModel.findOneAndUpdate(

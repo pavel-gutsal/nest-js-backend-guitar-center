@@ -12,7 +12,7 @@ export class Cart {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  name: string;
+  model: string;
 
   @IsNotEmpty()
   @IsNumber()

@@ -76,7 +76,7 @@ export class CatalogueService {
     shoppingCartListDto: ShoppingCartListDto,
   ): Promise<CatalogItem[]> {
     const { list } = shoppingCartListDto;
-    const normilizedList = list.map((cart) => cart.name);
+    const normilizedList = list.map((cart) => cart.model);
     return await this.itemModel.find().where('model').in(normilizedList).exec();
   }
 

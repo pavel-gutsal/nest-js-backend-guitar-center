@@ -20,7 +20,10 @@ export class StripeService {
 
   async getItems(cartCheckoutDto: CartCheckoutDto) {
     const { list } = cartCheckoutDto;
-    const normilizedList = list.map((cart) => cart.model);
+    const normilizedList = list.reduce((prev, curr) => {
+      if (curr.number < 1) return prev;
+      return [...prev, curr.model];
+    }, [] as string[]);
     return await this.itemModel.find().where('model').in(normilizedList).exec();
   }
 

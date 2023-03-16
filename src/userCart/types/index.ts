@@ -8,7 +8,7 @@ export class UserCartClass extends UserCart {
 
 export class Cart {
   @ApiProperty()
-  name: string;
+  model: string;
 
   @ApiProperty()
   number: number;
