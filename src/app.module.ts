@@ -5,6 +5,8 @@ import { TaskModule } from './tasks/task.module';
 import { AuthModule } from './auth/auth.module';
 import { CatalogueModule } from './catalogue/catalogue.module';
 import { ReviewModule } from './review/review.module';
+import { UserCartModule } from './userCart/userCart.module';
+import { StripeModule } from './stripe/stripe.module';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { ReviewModule } from './review/review.module';
     AuthModule,
     CatalogueModule,
     ReviewModule,
+    UserCartModule,
+    StripeModule,
   ],
 })
 export class AppModule {}

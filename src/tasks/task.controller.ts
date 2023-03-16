@@ -15,7 +15,9 @@ import { TaskService } from './task.service';
 import { CreateTaskDto, UpdateTaskDto, GetTasksFilterDto } from './dto';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/auth/get-user.decorator';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('tasks, endpoint used for learning and practice')
 @Controller('tasks')
 @UseGuards(AuthGuard())
 export class TaskController {

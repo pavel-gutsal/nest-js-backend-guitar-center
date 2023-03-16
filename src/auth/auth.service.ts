@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { UserDocument, User } from './schemas/auth.schema';
+import { AuthDocument, Auth } from './schemas/auth.schema';
 import { Model } from 'mongoose';
 import { SignupCredentialsDto, SigninCredentialsDto } from './dto';
 import * as bcrypt from 'bcrypt';
@@ -15,14 +15,16 @@ import { IToken } from './types';
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @InjectModel(Auth.name) private userModel: Model<AuthDocument>,
     private jwtService: JwtService,
   ) {}
 
-  async generateToken(user: UserDocument): Promise<IToken> {
+  async generateToken(user: AuthDocument): Promise<IToken> {
     const payload = { id: user._id };
 
-    const accessToken = await this.jwtService.sign(payload);
+    const accessToken = await this.jwtService.sign(payload, {
+      expiresIn: '1d',
+    });
 
     const response: IToken = {
       name: user.name,
@@ -46,7 +48,7 @@ export class AuthService {
     const { name, email, password } = signupCredentialsDto;
 
     try {
-      const user: UserDocument = await this.userModel.create({
+      const user: AuthDocument = await this.userModel.create({
         name,
         email,
         password: await this.hashPassword(password),
@@ -64,7 +66,7 @@ export class AuthService {
   async signIn(signinCredentialsDto: SigninCredentialsDto): Promise<IToken> {
     const { email, password } = signinCredentialsDto;
 
-    const user: UserDocument = await this.userModel.findOne({ email });
+    const user: AuthDocument = await this.userModel.findOne({ email });
 
     if (user && (await bcrypt.compare(password, user.password))) {
       return this.generateToken(user);
@@ -74,7 +76,7 @@ export class AuthService {
   }
 
   async validate(userEmail: string) {
-    const user: UserDocument = await this.userModel.findOne({
+    const user: AuthDocument = await this.userModel.findOne({
       email: userEmail,
     });
 

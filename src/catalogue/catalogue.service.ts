@@ -16,6 +16,8 @@ import { Item } from './schemas/catalogue.schema';
 import { Specifications } from './schemas/Specifications.schema';
 import { Category, SortBy } from './types';
 import { Product } from './types/product';
+import { LikedItemListDto } from 'src/userCart/dto/liked-item-list.dto';
+import { ShoppingCartListDto } from 'src/userCart/dto/shopping-cart-list.dto';
 
 @Injectable()
 export class CatalogueService {
@@ -63,6 +65,19 @@ export class CatalogueService {
     if (!item) {
       throw new NotFoundException('Item does not exist in database');
     }
+  }
+
+  async getLikedItemList(likedListItemDto: LikedItemListDto) {
+    const { list } = likedListItemDto;
+    return await this.itemModel.find().where('model').in(list).exec();
+  }
+
+  async getShoppingCartList(
+    shoppingCartListDto: ShoppingCartListDto,
+  ): Promise<CatalogItem[]> {
+    const { list } = shoppingCartListDto;
+    const normilizedList = list.map((cart) => cart.name);
+    return await this.itemModel.find().where('model').in(normilizedList).exec();
   }
 
   async postItem(createItemDto: CreateItemDto): Promise<CatalogItem> {

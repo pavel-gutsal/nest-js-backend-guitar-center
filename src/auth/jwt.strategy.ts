@@ -4,14 +4,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { PassportStrategy } from '@nestjs/passport';
 import { Model } from 'mongoose';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { User, UserDocument } from './schemas/auth.schema';
+import { Auth, AuthDocument } from './schemas/auth.schema';
 import { ConfigService } from '@nestjs/config/dist';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
-    @InjectModel(User.name)
-    private userModel: Model<UserDocument>,
+    @InjectModel(Auth.name)
+    private userModel: Model<AuthDocument>,
     private configService: ConfigService,
   ) {
     super({
@@ -20,7 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: { id: string }): Promise<UserDocument> {
+  async validate(payload: { id: string }): Promise<AuthDocument> {
     const { id } = payload;
 
     const user = await this.userModel.findById(id);
