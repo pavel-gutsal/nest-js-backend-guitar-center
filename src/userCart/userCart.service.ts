@@ -77,4 +77,15 @@ export class UserCartService {
     );
     return updatedCart;
   }
+
+  async reset(email: string) {
+    await this.getUserCart(email);
+    console.log('wee');
+    const updatedCart = await this.userCartModel.findOneAndUpdate(
+      { email },
+      { cart: [] },
+      { new: true },
+    );
+    return updatedCart;
+  }
 }

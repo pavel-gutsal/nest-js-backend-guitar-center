@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/auth/get-user.decorator';
+import { CheckoutCancelDto } from './dto/checkout-cancel.dto';
 import { CartCheckoutDto } from './dto/checkout.dto';
 import { StripeService } from './stripe.service';
 import { PaymentIntent } from './types';
@@ -16,5 +17,10 @@ export class StripeController {
     @Body() cartCheckoutDto: CartCheckoutDto,
   ): Promise<PaymentIntent> {
     return this.stripeService.paymentIntent(email, cartCheckoutDto);
+  }
+
+  @Post('payment-cancel')
+  async paymentCancel(@Body() checkoutCancelDto: CheckoutCancelDto) {
+    return this.stripeService.paymentCancel(checkoutCancelDto);
   }
 }

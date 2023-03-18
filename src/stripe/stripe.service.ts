@@ -4,6 +4,7 @@ import { isNil } from 'lodash';
 import { Model } from 'mongoose';
 import { Item } from 'src/catalogue/schemas/catalogue.schema';
 import Stripe from 'stripe';
+import { CheckoutCancelDto } from './dto/checkout-cancel.dto';
 import { CartCheckoutDto } from './dto/checkout.dto';
 import { PaymentIntent } from './types';
 
@@ -54,9 +55,9 @@ export class StripeService {
     const amount = await this.calculateTotalPrice(cartCheckoutDto);
 
     const paymentIntent = await this.stripe.paymentIntents.create({
+      payment_method_types: ['card'],
       currency: 'USD',
-      amount,
-      automatic_payment_methods: { enabled: true },
+      amount: amount * 100,
     });
 
     if (!paymentIntent) {
@@ -68,6 +69,14 @@ export class StripeService {
     return {
       publishableKey,
       clientSecret: paymentIntent.client_secret,
+      paymentID: paymentIntent.id,
     };
+  }
+
+  async paymentCancel(checkoutCancelDto: CheckoutCancelDto) {
+    const { id } = checkoutCancelDto;
+    const paymentIntent = await this.stripe.paymentIntents.cancel(id);
+
+    return paymentIntent.status;
   }
 }

@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GetUser } from 'src/auth/get-user.decorator';
@@ -56,5 +64,10 @@ export class UserCartController {
   @Patch('cart')
   async updateSpecificCart(@GetUser() email: string, @Body() cartDto: Cart) {
     return await this.userCartService.updateSpecificCart(email, cartDto);
+  }
+
+  @Delete('reset')
+  async resetCart(@GetUser() email: string) {
+    return await this.userCartService.reset(email);
   }
 }
