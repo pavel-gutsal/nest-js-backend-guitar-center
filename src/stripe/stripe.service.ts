@@ -1,9 +1,11 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { isNil } from 'lodash';
 import { Model } from 'mongoose';
 import { Item } from 'src/catalogue/schemas/catalogue.schema';
 import Stripe from 'stripe';
 import { CartCheckoutDto } from './dto/checkout.dto';
+import { PaymentIntent } from './types';
 
 @Injectable()
 export class StripeService {
@@ -18,42 +20,54 @@ export class StripeService {
     });
   }
 
-  async getItems(cartCheckoutDto: CartCheckoutDto) {
+  async calculateTotalPrice(cartCheckoutDto: CartCheckoutDto) {
     const { list } = cartCheckoutDto;
     const normilizedList = list.reduce((prev, curr) => {
       if (curr.number < 1) return prev;
       return [...prev, curr.model];
     }, [] as string[]);
-    return await this.itemModel.find().where('model').in(normilizedList).exec();
+
+    const items = await this.itemModel
+      .find()
+      .where('model')
+      .in(normilizedList)
+      .exec();
+
+    const price = items.reduce((prev, curr) => {
+      const number = list.find((el) => el.model === curr.model)?.number || 1;
+      return prev + curr.discountedPrice * number;
+    }, 0);
+
+    return price;
   }
 
-  async checkout(email: string, cartCheckoutDto: CartCheckoutDto) {
-    const catalogueItems = await this.getItems(cartCheckoutDto);
-    try {
-      return await this.stripe.checkout.sessions.create({
-        payment_method_types: ['card'],
-        mode: 'payment',
-        line_items: catalogueItems.map((item) => {
-          return {
-            price_data: {
-              currency: 'usd',
-              product_data: {
-                name: item.name,
-              },
-              unit_amount: item.discountedPrice * 100,
-            },
-            quantity:
-              cartCheckoutDto.list.find((el) => el.model === item.model)
-                ?.number || 0,
-          };
-        }),
-        success_url: `${process.env.CLIENT_URL}/success`,
-        cancel_url: `${process.env.CLIENT_URL}/error`,
-      });
-    } catch (err) {
+  async paymentIntent(
+    email: string,
+    cartCheckoutDto: CartCheckoutDto,
+  ): Promise<PaymentIntent> {
+    const publishableKey = process.env.STRIPE_PUBLISHABLE_KEY;
+
+    if (isNil(publishableKey)) {
+      throw new InternalServerErrorException('failed to fetch publishable key');
+    }
+
+    const amount = await this.calculateTotalPrice(cartCheckoutDto);
+
+    const paymentIntent = await this.stripe.paymentIntents.create({
+      currency: 'USD',
+      amount,
+      automatic_payment_methods: { enabled: true },
+    });
+
+    if (!paymentIntent) {
       throw new InternalServerErrorException(
         'something gone wrong during checkout',
       );
     }
+
+    return {
+      publishableKey,
+      clientSecret: paymentIntent.client_secret,
+    };
   }
 }
