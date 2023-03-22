@@ -1,6 +1,6 @@
 # eCommerce App fullStack
 
-![node version:](18.x)
+node version: 18.x
 
 ## backend:
   * `nest.js` framework
