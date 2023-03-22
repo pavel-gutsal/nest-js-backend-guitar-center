@@ -7,6 +7,7 @@ node version: 18.x
   * `MongoDB` and `mongoose`
   * `class validator` --> decorator based validation of clients requests
   * `JsonWebToken` --> user authentification
+  * `OpenAPI(Swagger)` --> for documentating nest.js API
 
 backend API = https://web-shop-backend-2.onrender.com
 
